@@ -166,21 +166,12 @@ export class WorkspaceDetailsController {
 
   /**
    * Callback which is called after workspace config was changed
-   * @returns {Promise}
    */
-  updateWorkspaceConfig() {
+  updateWorkspaceConfig(): void {
     this.editMode = !angular.equals(this.copyWorkspaceDetails.config, this.workspaceDetails.config);
 
     let status = this.getWorkspaceStatus();
-    if (status === 'STOPPED' || status === 'STOPPING') {
-      this.showApplyMessage = false;
-    } else {
-      this.showApplyMessage = true;
-    }
-
-    let defer = this.$q.defer();
-    defer.resolve();
-    return defer.promise;
+    this.showApplyMessage = status !== 'STOPPED' && status !== 'STOPPING';
   }
 
   /**

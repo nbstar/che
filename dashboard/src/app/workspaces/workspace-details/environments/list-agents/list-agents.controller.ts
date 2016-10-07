@@ -49,7 +49,8 @@ export class ListAgentsController {
     } else {
       this.agents.splice(this.agents.indexOf(agent.name), 1);
     }
-    return this.agentsOnChange().then(() => { this.buildAgentsList() });
+    this.agentsOnChange();
+    this.buildAgentsList();
   }
 
   /**

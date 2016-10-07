@@ -56,12 +56,18 @@ export class WorkspaceEnvironmentsController {
     }, () => {
       this.init();
     });
+
+    this.init();
   }
 
   /**
    * Sets initial values
    */
   init() {
+    if (!this.workspaceConfig || !this.workspaceConfig.environments) {
+      return;
+    }
+
     this.newEnvironmentName = this.environmentName;
     this.environment = this.workspaceConfig.environments[this.environmentName];
 
@@ -133,9 +139,8 @@ export class WorkspaceEnvironmentsController {
     this.workspaceConfig.environments[this.environmentName] = newEnvironment;
     this.environment = newEnvironment;
 
-    return this.doUpdateEnvironments().then(() => {
-      this.init();
-    });
+    this.doUpdateEnvironments();
+    this.init();
   }
 
   /**
@@ -162,9 +167,8 @@ export class WorkspaceEnvironmentsController {
     this.machinesViewStatus[this.newEnvironmentName][newName] = this.machinesViewStatus[this.newEnvironmentName][oldName];
     delete this.machinesViewStatus[this.newEnvironmentName][oldName];
 
-    return this.doUpdateEnvironments().then(() => {
-      this.init();
-    })
+    this.doUpdateEnvironments();
+    this.init();
   }
 
   /**
@@ -175,9 +179,9 @@ export class WorkspaceEnvironmentsController {
   deleteMachine(name) {
     let newEnvironment = this.environmentManager.deleteMachine(this.environment, name);
     this.workspaceConfig.environments[this.newEnvironmentName] = newEnvironment;
-    return this.doUpdateEnvironments().then(() => {
-      this.init();
-    })
+
+    this.doUpdateEnvironments();
+    this.init();
   }
 
   /**
