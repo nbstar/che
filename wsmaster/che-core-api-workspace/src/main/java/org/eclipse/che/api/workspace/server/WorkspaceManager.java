@@ -744,8 +744,18 @@ public class WorkspaceManager {
                 snapshot = runtimes.saveMachine(namespace,
                                                 machine.getWorkspaceId(),
                                                 machine.getId());
-
-                snapshotDao.saveSnapshot(snapshot);
+                // check if the workspace exists before creating a snapshot,
+                // if it is not an integrity constraint violation exception will occur,
+                // this may happen when workspace stop called simultaneously.
+                // The issue https://github.com/eclipse/che/issues/2683 should fix it
+                // in a way that it won't be possible to snapshot workspace simultaneously.
+                if (exists(machine.getWorkspaceId())) {
+                    snapshotDao.saveSnapshot(snapshot);
+                } else {
+                    LOG.warn("Snapshot for a workspace '{}' won't be saved, as the workspace doesn't exist anymore",
+                             machine.getWorkspaceId());
+                    runtimes.removeSnapshot(snapshot);
+                }
             } catch (ApiException e) {
                 if (snapshot != null) {
                     try {
@@ -845,5 +855,15 @@ public class WorkspaceManager {
         final String wsName = parts[1];
         final String namespace = nsPart.isEmpty() ? sessionUser().getUserName() : nsPart;
         return workspaceDao.get(wsName, namespace);
+    }
+
+    /** Returns true if workspace exists and false otherwise. */
+    private boolean exists(String workspaceId) throws ServerException {
+        try {
+            workspaceDao.get(workspaceId);
+        } catch (NotFoundException x) {
+            return false;
+        }
+        return true;
     }
 }
