@@ -24,6 +24,7 @@ import org.eclipse.che.commons.lang.concurrent.ThreadLocalPropagateContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import java.io.IOException;
 import java.util.concurrent.ExecutorService;
@@ -35,18 +36,19 @@ import java.util.concurrent.Executors;
  * @author Alexander Andrienko
  */
 @Singleton
-public class RemoveWorkspaceListener implements EventSubscriber<WorkspaceRemovedEvent> {
+public class RemoveWorkspaceFilesAfterRemoveWorkspaceEventSubscriber implements EventSubscriber<WorkspaceRemovedEvent> {
 
-    private static final Logger LOG = LoggerFactory.getLogger(RemoveWorkspaceListener.class);
+    private static final Logger LOG = LoggerFactory.getLogger(RemoveWorkspaceFilesAfterRemoveWorkspaceEventSubscriber.class);
 
     private final WorkspaceFilesCleaner workspaceFilesCleaner;
     private final ExecutorService       executor;
+    private final EventService          eventService;
 
     @Inject
-    public RemoveWorkspaceListener(EventService eventService, WorkspaceFilesCleaner workspaceFilesCleaner) {
+    public RemoveWorkspaceFilesAfterRemoveWorkspaceEventSubscriber(EventService eventService, WorkspaceFilesCleaner workspaceFilesCleaner) {
         this.workspaceFilesCleaner = workspaceFilesCleaner;
-        eventService.subscribe(this);
-        executor = Executors.newCachedThreadPool(new ThreadFactoryBuilder().setNameFormat("RemoveWorkspaceListener-%d")
+        this.eventService = eventService;
+        executor = Executors.newCachedThreadPool(new ThreadFactoryBuilder().setNameFormat("RemoveWorkspaceFilesAfterRemoveWorkspaceEventSubscriber-%d")
                                                                            .setDaemon(true)
                                                                            .build());
     }
@@ -58,8 +60,13 @@ public class RemoveWorkspaceListener implements EventSubscriber<WorkspaceRemoved
             try {
                 workspaceFilesCleaner.clear(workspace);
             } catch (IOException | ServerException e) {
-                LOG.error("Failed to delete folder for workspace with id: '{}'. Cause: '{}'", workspace.getId(), e.getMessage());
+                LOG.error("Failed to remove workspace files for workspace with id: '{}'. Cause: '{}'", workspace.getId(), e.getMessage());
             }
         }));
+    }
+
+    @PostConstruct
+    public void subscribe() {
+        eventService.subscribe(this);
     }
 }

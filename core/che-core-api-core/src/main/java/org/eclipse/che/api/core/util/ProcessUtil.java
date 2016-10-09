@@ -85,7 +85,7 @@ public final class ProcessUtil {
      * @param commandLine
      *         arguments of process command
      * @param timeout
-     *         timeout for process. If process duration > {@code timeout} then kill process and throw {@link TimeoutException}.
+     *         timeout for process. If process duration > {@code timeout} than kill process and throw {@link TimeoutException}.
      * @param timeUnit
      *         timeUnit of the {@code timeout}.
      * @param outputConsumer
@@ -98,7 +98,7 @@ public final class ProcessUtil {
      * @throws TimeoutException
      *         if process gets more time then defined by {@code timeout}
      */
-    public static Process execute(String[] commandLine, int timeout, TimeUnit timeUnit, LineConsumer outputConsumer)
+    public static Process executeAndWait(String[] commandLine, int timeout, TimeUnit timeUnit, LineConsumer outputConsumer)
             throws TimeoutException, IOException, InterruptedException {
         ProcessBuilder pb = new ProcessBuilder(commandLine).redirectErrorStream(true);
 
@@ -109,12 +109,17 @@ public final class ProcessUtil {
                 // consume logs until process ends
                 process(process, outputConsumer);
             } catch (IOException e) {
-                LOG.error(format("Failed to complete process '%s'.", Joiner.on(" ").join(commandLine)), e);
+                LOG.error(format("Failed to complete reading of the process '%s' output due to occurred error",
+                                 Joiner.on(" ").join(commandLine)), e);
             }
         });
 
         if (!process.waitFor(timeout, timeUnit)) {
-            ProcessUtil.kill(process);
+            try {
+                ProcessUtil.kill(process);
+            } catch (RuntimeException x) {
+                LOG.error("An error occurred while killing process '{}'", Joiner.on(" ").join(commandLine));
+            }
             throw new TimeoutException(format("Process '%s' was terminated by timeout %s %s.",
                                               Joiner.on(" ").join(commandLine), timeout, timeUnit.name().toLowerCase()));
         }

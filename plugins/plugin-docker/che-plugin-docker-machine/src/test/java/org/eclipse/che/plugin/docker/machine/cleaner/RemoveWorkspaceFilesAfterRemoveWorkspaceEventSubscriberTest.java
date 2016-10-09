@@ -25,12 +25,12 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Test for {@link RemoveWorkspaceListener}
+ * Test for {@link RemoveWorkspaceFilesAfterRemoveWorkspaceEventSubscriber}
  *
  * @author Alexander Andrienko
  */
 @Listeners(MockitoTestNGListener.class)
-public class RemoveWorkspaceListenerTest {
+public class RemoveWorkspaceFilesAfterRemoveWorkspaceEventSubscriberTest {
     //mocks for constructor
     @Mock
     private EventService          eventService;
@@ -42,23 +42,25 @@ public class RemoveWorkspaceListenerTest {
     @Mock
     private Workspace             workspace;
 
-    private RemoveWorkspaceListener removeWorkspaceListener;
+    private RemoveWorkspaceFilesAfterRemoveWorkspaceEventSubscriber removeWorkspaceFilesAfterRemoveWorkspaceEventSubscriber;
 
     @BeforeMethod
     public void setUp() {
-        removeWorkspaceListener = new RemoveWorkspaceListener(eventService, workspaceFilesCleaner);
+        removeWorkspaceFilesAfterRemoveWorkspaceEventSubscriber = new RemoveWorkspaceFilesAfterRemoveWorkspaceEventSubscriber(eventService, workspaceFilesCleaner);
     }
 
     @Test
     public void shouldSubscribeListenerToEventService() {
-        verify(eventService).subscribe(removeWorkspaceListener);
+        removeWorkspaceFilesAfterRemoveWorkspaceEventSubscriber.subscribe();
+
+        verify(eventService).subscribe(removeWorkspaceFilesAfterRemoveWorkspaceEventSubscriber);
     }
 
     @Test
     public void workspaceShouldBeCleaned() throws Exception {
         when(event.getWorkspace()).thenReturn(workspace);
 
-        removeWorkspaceListener.onEvent(event);
+        removeWorkspaceFilesAfterRemoveWorkspaceEventSubscriber.onEvent(event);
 
         verify(event, timeout(2000)).getWorkspace();
         verify(workspaceFilesCleaner).clear(workspace);

@@ -15,8 +15,8 @@ import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 
 import org.eclipse.che.api.core.model.workspace.Workspace;
-import org.eclipse.che.api.core.util.FileCleaner;
 import org.eclipse.che.api.workspace.server.WorkspaceFilesCleaner;
+import org.eclipse.che.commons.lang.IoUtil;
 import org.eclipse.che.plugin.docker.machine.local.node.provider.LocalWorkspaceFolderPathProvider;
 
 import java.io.File;
@@ -46,7 +46,7 @@ public class LocalWorkspaceFilesCleaner implements WorkspaceFilesCleaner {
         String workspacePath = workspaceFolderPathProvider.getPathByName(workspace.getConfig().getName());
         File workspaceStorage = new File(workspacePath);
         if (!workspacePath.equals(hostProjectsFolder) && workspaceStorage.exists()) {
-            FileCleaner.addFile(workspaceStorage);
+            IoUtil.deleteRecursive(workspaceStorage);
         }
     }
 }
