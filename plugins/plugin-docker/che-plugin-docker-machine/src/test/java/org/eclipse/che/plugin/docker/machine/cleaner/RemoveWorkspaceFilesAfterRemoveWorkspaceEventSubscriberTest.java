@@ -25,7 +25,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Test for {@link RemoveWorkspaceFilesAfterRemoveWorkspaceEventSubscriber}
+ * Test for {@link RemoveWorkspaceFilesAfterRemoveWorkspaceEventSubscriber}.
  *
  * @author Alexander Andrienko
  */
@@ -46,7 +46,8 @@ public class RemoveWorkspaceFilesAfterRemoveWorkspaceEventSubscriberTest {
 
     @BeforeMethod
     public void setUp() {
-        removeWorkspaceFilesAfterRemoveWorkspaceEventSubscriber = new RemoveWorkspaceFilesAfterRemoveWorkspaceEventSubscriber(eventService, workspaceFilesCleaner);
+        removeWorkspaceFilesAfterRemoveWorkspaceEventSubscriber =
+                new RemoveWorkspaceFilesAfterRemoveWorkspaceEventSubscriber(eventService, workspaceFilesCleaner);
     }
 
     @Test

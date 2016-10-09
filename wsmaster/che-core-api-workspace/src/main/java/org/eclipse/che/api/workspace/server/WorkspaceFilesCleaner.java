@@ -16,15 +16,14 @@ import org.eclipse.che.api.core.model.workspace.Workspace;
 import java.io.IOException;
 
 /**
- * This component removes workspace folder with user's projects after delete workspace operation.
+ * This component removes workspace files with user's projects after delete workspace operation.
  *
  * @author Alexander Andrienko
  */
 public interface WorkspaceFilesCleaner {
 
     /**
-     * Removes workspace folder with all projects. Note: all projects data for {@code workspace}
-     * will be lost. Usually used for delete workspace operation.
+     * Removes workspace files with all projects. Note: all projects data for {@code workspace} will be lost.
      *
      * @param workspace
      *         workspace to clean up files
