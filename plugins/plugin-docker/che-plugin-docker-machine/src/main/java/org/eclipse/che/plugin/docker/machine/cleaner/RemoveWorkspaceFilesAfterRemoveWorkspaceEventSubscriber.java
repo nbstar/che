@@ -31,7 +31,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
- * Listener for event {@code WorkspaceRemovedEvent}. It is used for clean up workspace files resources.
+ * Listener for remove workspace files after {@code WorkspaceRemovedEvent}.
  *
  * @author Alexander Andrienko
  */
